@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Set bash to 'debug' mode, it will exit on :
 # -e 'error', -u 'undefined variable', -o ... 'error in pipeline', -x 'print commands',
-set -e
-set -u
-set -o pipefail
+# set -e
+# set -u
+# set -o pipefail
 
 domain=all      #all, cts, ood
 src_lang=all
@@ -35,7 +35,7 @@ nbpe=16000
 # mkdir -p data/token_list
 # cd data/token_list && cp -r ../../../st1/data/all_eng_token_list/src_bpe_unigram16000 bpe_unigram16000 && cd -
 
-./st.sh \
+./asr.sh \
     --skip_data_prep True \     # skipping data prep, relying on st1
     --audio_format "flac.ark" \
     --nj 40 \
