@@ -36,13 +36,13 @@ nbpe=16000
 # cd data/token_list && cp -r ../../../st1/data/all_eng_token_list/src_bpe_unigram16000 bpe_unigram16000 && cd -
 
 ./asr.sh \
-    --skip_data_prep True \     # skipping data prep, relying on st1
+    --skip_data_prep true \
     --audio_format "flac.ark" \
     --nj 40 \
     --inference_nj 40 \
     --lang ${src_lang} \
     --token_type "bpe" \
-    --src_nbpe $nbpe \
+    --nbpe $nbpe \
     --feats_type raw \
     --speed_perturb_factors "0.9 1.0 1.1" \
     --asr_config "${asr_config}" \
@@ -52,5 +52,5 @@ nbpe=16000
     --test_sets "${test_set}" \
     --bpe_train_text "data/${train_set}/text" \
     --lm_train_text "data/${train_set}/text"  "$@" \
-    --expdir exp_${domain}_${lang} \
+    --expdir exp_${domain}_${src_lang} \
     --bpe_nlsyms "[ara],[cmn],[kor],[rus],[spa]"
