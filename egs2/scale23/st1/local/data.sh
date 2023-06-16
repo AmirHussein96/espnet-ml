@@ -122,6 +122,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     done
 
     utils/combine_data.sh --extra_files "text.tc.eng" data/dev_all data/dev_ara data/dev_cmn data/dev_kor data/dev_rus data/dev_spa
+    cp data/dev_all/text data/dev_all/text.tc.rm.lid.all
 fi
 
 log "Successfully finished. [elapsed=${SECONDS}s]"

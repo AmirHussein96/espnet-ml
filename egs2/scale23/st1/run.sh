@@ -62,4 +62,4 @@ tgt_case=tc
     --tgt_bpe_train_text "data/${train_set}/text.${tgt_case}.${tgt_lang}" \
     --lm_train_text "data/${train_set}/text.${tgt_case}.${tgt_lang}"  "$@" \
     --expdir exp_${domain}_${src_lang} \
-    --src_bpe_nlsyms "[ara] [cmn] [kor] [rus] [spa]"
+    --src_bpe_nlsyms "[ara],[cmn],[kor],[rus],[spa]"
