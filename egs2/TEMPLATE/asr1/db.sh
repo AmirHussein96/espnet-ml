@@ -181,6 +181,7 @@ AMEBOSHI=
 ITAKO=
 NATSUME=
 KIRITAN=
+SCALE23=/exp/scale23/data/
 
 # For only CMU TIR environment
 if [[ "$(hostname)" == tir* ]]; then
