@@ -7,7 +7,7 @@
 # general configuration
 stage=0
 stop_stage=100
-stereo=false
+stereo=true
 train_set=
 dev_set=
 src_lang=

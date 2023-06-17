@@ -507,9 +507,10 @@ class Stm(object):
                         channel = 1
                     else:
                         channel = 2
-                    convert_cmd = 'sox -t flac %s -t .wav -r %d -b 16 - remix %s |' % (s.filename, fs, channel)
+                    convert_cmd = 'sox %s -t .wav -r %d -b 16 - remix %s |' % (s.filename, fs, channel)
                 else:
-                    convert_cmd = 'sox -t flac %s -t .wav -r %d -b 16 - |' % (s.filename, fs)
+                    convert_cmd = 'sox %s -t .wav -r %d -b 16 - |' % (s.filename, fs)
+                # convert_cmd = 'ffmpeg -i %s -f wav -ar %.0f -ac 1 - |' % (s.filename, fs)
             elif audioext == '.mp3':
                 if stereo:
                     if s.channel == 'A':

@@ -31,9 +31,23 @@ inference_config=conf/tuning/decode_asr_conformer.yaml
 nbpe=16000
 
 ## Recommend to do data prep in st1, then copy/soft link the dump directory:
-# ln -s ../st1/dump .
-# mkdir -p data/token_list
-# cd data/token_list && cp -r ../../../st1/data/all_eng_token_list/src_bpe_unigram16000 bpe_unigram16000 && cd -
+if [ -e ../st1/dump ]; then
+    if [ ! -e . ]; then
+        ln -s ../st1/dump .
+    fi
+else 
+    echo "run stages 1-5 of scale23/st1"
+    # exit
+fi
+if [ -e ../st1/data ]; then
+    if [ ! -e . ]; then
+        mkdir -p data/${src_lang}_token_list
+        cd data/${src_lang}_token_list && cp -r ../../../st1/data/all_eng_token_list/src_bpe_unigram16000 bpe_unigram16000 && cd -
+    fi
+else 
+    echo "run stages 1-5 of scale23/st1"
+    # exit
+fi
 
 ./asr.sh \
     --skip_data_prep true \
