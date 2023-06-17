@@ -5,8 +5,10 @@
 # set -u
 # set -o pipefail
 
+# by default, this will run all domains, all langs, combined
+# you can choose to run this on a subset by changing the values below
 domain=all      #all, cts, ood
-src_lang=all
+src_lang=all    #ara, cmn, kor, rus, spa
 tgt_lang=eng
 
 train_set=train-${domain}_${src_lang}
