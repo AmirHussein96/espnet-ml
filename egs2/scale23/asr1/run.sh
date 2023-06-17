@@ -32,7 +32,7 @@ nbpe=16000
 
 ## Recommend to do data prep in st1, then copy/soft link the dump directory:
 if [ -e ../st1/dump ]; then
-    if [ ! -e . ]; then
+    if [ ! -e dump ]; then
         ln -s ../st1/dump .
     fi
 else 
@@ -40,7 +40,7 @@ else
     # exit
 fi
 if [ -e ../st1/data ]; then
-    if [ ! -e . ]; then
+    if [ ! -e data ]; then
         mkdir -p data/${src_lang}_token_list
         cd data/${src_lang}_token_list && cp -r ../../../st1/data/all_eng_token_list/src_bpe_unigram16000 bpe_unigram16000 && cd -
     fi
