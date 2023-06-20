@@ -6,7 +6,7 @@
 # set -o pipefail
 
 domain=all      #all, cts, ood
-src_lang=all
+src_lang=spa
 
 train_set=train-${domain}_${src_lang}
 train_dev=dev_${src_lang}
@@ -28,7 +28,7 @@ fi
 asr_config=conf/tuning/train_asr_conformer.yaml
 inference_config=conf/tuning/decode_asr_conformer.yaml
 
-nbpe=32000
+nbpe=4000
 
 ## Recommend to do data prep in st1, then copy/soft link the dump directory:
 if [ -e ../st1/dump ]; then
@@ -39,10 +39,10 @@ else
     echo "run stages 1-5 of scale23/st1"
     # exit
 fi
-if [ -e ../st1/data ]; then
-    if [ ! -e data ]; then
+if [ -e ../st1/data//${src_lang}_token_list ]; then
+    if [ ! -e data/${src_lang}_token_list ]; then
         mkdir -p data/${src_lang}_token_list
-        cd data/${src_lang}_token_list && cp -r ../../../st1/data/all_eng_token_list/src_bpe_unigram16000 bpe_unigram16000 && cd -
+        cd data/${src_lang}_token_list && cp -r ../../../st3/data/${domain}_${src_lang}_token_list/src_bpe_unigram${nbpe} bpe_unigram${nbpe} && cd -
     fi
 else 
     echo "run stages 1-5 of scale23/st1"
