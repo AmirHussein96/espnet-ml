@@ -7,8 +7,8 @@
 
 # by default, this will run all domains, all langs, combined
 # you can choose to run this on a subset by changing the values below
-domain=all      #all, cts, ood
-src_lang=all    #ara, cmn, kor, rus, spa
+domain=cts      #all, cts, ood
+src_lang=spa    #ara, cmn, kor, rus, spa
 tgt_lang=eng
 
 train_set=train-${domain}_${src_lang}
@@ -31,8 +31,8 @@ fi
 st_config=conf/tuning/train_st_conformer.yaml
 inference_config=conf/tuning/decode_st_conformer.yaml
 
-src_nbpe=32000
-tgt_nbpe=8000
+src_nbpe=4000
+tgt_nbpe=4000
 
 # tc: truecase
 # lc: lowercase
