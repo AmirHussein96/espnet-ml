@@ -1019,6 +1019,7 @@ class AbsTask(ABC):
             task_keys = cls.required_data_names(
                 train, inference
             ) + cls.optional_data_names(train, inference)
+            
             for k in dataset.names():
                 if k not in task_keys:
                     raise RuntimeError(

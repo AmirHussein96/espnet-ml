@@ -14,7 +14,7 @@ from espnet2.asr.transducer.beam_search_transducer import Hypothesis as TransHyp
 from espnet2.fileio.datadir_writer import DatadirWriter
 from espnet2.tasks.enh_s2t import EnhS2TTask
 from espnet2.tasks.lm import LMTask
-from espnet2.tasks.st import STTask
+from espnet2.tasks.stcx import STTask
 from espnet2.text.build_tokenizer import build_tokenizer
 from espnet2.text.token_id_converter import TokenIDConverter
 from espnet2.torch_utils.device_funcs import to_device
@@ -337,6 +337,7 @@ class Speech2Text:
             return_hs=True,
         )
         # TODO(karita): make all scorers batchfied
+        
         if batch_size == 1:
             non_batch = [
                 k
@@ -420,7 +421,8 @@ class Speech2Text:
 
     @torch.no_grad()
     def __call__(
-        self, speech: Union[torch.Tensor, np.ndarray]
+        self, speech: Union[torch.Tensor, np.ndarray],
+        text_prev: Optional[Union[torch.Tensor, np.ndarray, str]] = None,
     ) -> List[
         Tuple[Optional[str], List[str], List[int], Union[Hypothesis, TransHypothesis]]
     ]:
@@ -428,11 +430,34 @@ class Speech2Text:
 
         Args:
             data: Input speech data
+            text_prev: Previous text used as condition (optional)
         Returns:
             text, token, token_int, hyp
 
         """
         assert check_argument_types()
+        # Prepare hyp_primer
+        if text_prev is not None:
+            if isinstance(text_prev, str):
+                text_prev = self.converter.tokens2ids(
+                    self.tokenizer.text2tokens(text_prev)
+                )
+            else:
+                text_prev = text_prev.tolist()
+
+            # Check if text_prev is valid
+            if self.st_model.na in text_prev:
+                text_prev = None
+
+        if text_prev is not None:
+            hyp_primer = (
+                [self.st_model.sop]
+                + text_prev
+                + [self.st_model.sos]
+            )
+        else:
+            hyp_primer = [self.st_model.sos]
+        self.beam_search.set_hyp_primer(hyp_primer)
 
         # Input as audio signal
         if isinstance(speech, np.ndarray):
@@ -443,10 +468,10 @@ class Speech2Text:
         # lengths: (1,)
         lengths = speech.new_full([1], dtype=torch.long, fill_value=speech.size(1))
         batch = {"speech": speech, "speech_lengths": lengths}
+        logging.info("speech length: " + str(speech.size(1)))
 
         # a. To device
         batch = to_device(batch, device=self.device)
-
         # b. Forward Encoder
         enc, _, asr_enc, _ = self.st_model.encode(**batch, return_int_enc=True)
         assert len(enc) == 1, len(enc)
@@ -539,6 +564,7 @@ class Speech2Text:
                 "best hypo: " + "".join(self.converter.ids2tokens(best.yseq[1:])) + "\n"
             )
         else:
+            #breakpoint()
             nbest_hyps = self.beam_search(
                 x=x, maxlenratio=self.maxlenratio, minlenratio=self.minlenratio
             )
@@ -717,6 +743,7 @@ def inference(
     )
 
     # 3. Build data-iterator 
+    #breakpoint()
     loader = STTask.build_streaming_iterator(
         data_path_and_name_and_type,
         dtype=dtype,
@@ -738,6 +765,7 @@ def inference(
             _bs = len(next(iter(batch.values())))
             assert len(keys) == _bs, f"{len(keys)} != {_bs}"
             batch = {k: v[0] for k, v in batch.items() if not k.endswith("_lengths")}
+            #breakpoint()
             # N-best list of (text, token, token_int, hyp_object)
             try:
                 results = speech2text(**batch)

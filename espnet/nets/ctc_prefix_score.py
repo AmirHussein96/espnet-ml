@@ -73,6 +73,7 @@ class CTCPrefixScoreTH(object):
         :param torch.Tensor att_w: attention weights to decide CTC window
         :return new_state, ctc_local_scores (BW, O)
         """
+        #breakpoint()
         output_length = len(y[0]) - 1  # ignore sos
         last_ids = [yi[-1] for yi in y]  # last output label ids
         n_bh = len(last_ids)  # batch * hyps
@@ -160,6 +161,7 @@ class CTCPrefixScoreTH(object):
             r[t] = torch.logsumexp(rr, 1) + x_[:, t]
 
         # compute log prefix probabilities log(psi)
+        #breakpoint()
         log_phi_x = torch.cat((log_phi[0].unsqueeze(0), log_phi[:-1]), dim=0) + x_[0]
         if scoring_ids is not None:
             log_psi = torch.full(

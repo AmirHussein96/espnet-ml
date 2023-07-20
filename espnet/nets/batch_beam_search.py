@@ -332,9 +332,26 @@ class BatchBeamSearch(BeamSearch):
         # NOTE(takaaki-hori): Unlike BeamSearch, we assume that score_partial returns
         # full-size score matrices, which has non-zero scores for part_ids and zeros
         # for others.
-        part_scores, part_states = self.score_partial(
-            running_hyps, part_ids, x, pre_x, md2=md2
-        )
+        #breakpoint()
+        
+        # Amir Hussein: make sure the ctc does not consider the hyp_primer
+        if self.hyp_primer:
+            if len(self.hyp_primer) > 1:
+                ctc_running_hyps =  Hypothesis(score=running_hyps.score,
+                                                scores=running_hyps.scores,
+                                                states=running_hyps.states,
+                                                hs=running_hyps.hs,
+                                                yseq=running_hyps.yseq[:, len(self.hyp_primer)-1:],)
+            
+                part_scores, part_states = self.score_partial(
+                    ctc_running_hyps, part_ids, x, pre_x, md2=md2)
+            else:
+                part_scores, part_states = self.score_partial(
+                running_hyps, part_ids, x, pre_x, md2=md2)
+        else:
+            part_scores, part_states = self.score_partial(
+                running_hyps, part_ids, x, pre_x, md2=md2
+            )
         for k in self.part_scorers:
             weighted_scores += self.weights[k] * part_scores[k]
         # add previous hyp scores

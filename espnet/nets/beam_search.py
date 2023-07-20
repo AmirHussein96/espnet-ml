@@ -184,12 +184,15 @@ class BeamSearch(torch.nn.Module):
         states = dict()
         for k, d in self.full_scorers.items():
             if "decoder" in k and self.return_hs:
+                #breakpoint()
                 scores[k], hs, states[k] = d.score(
                     hyp.yseq, hyp.states[k], x, return_hs=self.return_hs
                 )
             elif pre_x is not None:
+                #breakpoint()
                 scores[k], states[k] = d.score(hyp.yseq, hyp.states[k], x, pre_x)
             else:
+                #breakpoint()
                 scores[k], states[k] = d.score(hyp.yseq, hyp.states[k], x)
 
         if self.return_hs:
@@ -413,6 +416,7 @@ class BeamSearch(torch.nn.Module):
         ended_hyps = []
         for i in range(maxlen):
             logging.debug("position " + str(i))
+            #breakpoint()
             best = self.search(running_hyps, x, pre_x=pre_x)
             # post process of one iteration
             running_hyps = self.post_process(i, maxlen, maxlenratio, best, ended_hyps)
@@ -425,7 +429,19 @@ class BeamSearch(torch.nn.Module):
                 break
             else:
                 logging.debug(f"remained hypotheses: {len(running_hyps)}")
-
+        
+        # Amir Hussein: remove the context from the final prediction
+        #breakpoint()
+        if self.hyp_primer:
+            if len(self.hyp_primer) > 1:
+                tmp_ended_hyps = []
+                for j in range(len(ended_hyps)):
+                    tmp_ended_hyps.append(Hypothesis(score=ended_hyps[j].score,
+                                                scores=ended_hyps[j].scores,
+                                                states=ended_hyps[j].states,
+                                                hs=ended_hyps[j].hs,
+                                                yseq=ended_hyps[j].yseq[len(self.hyp_primer)-1:],))
+                ended_hyps = tmp_ended_hyps
         nbest_hyps = sorted(ended_hyps, key=lambda x: x.score, reverse=True)
 
         # check the number of hypotheses reaching to eos
@@ -441,6 +457,8 @@ class BeamSearch(torch.nn.Module):
             )
 
         # report the best result
+        
+
         best = nbest_hyps[0]
         for k, v in best.scores.items():
             logging.info(
